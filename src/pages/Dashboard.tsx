@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ContentCard from '@/components/ContentCard';
 import FilterDropdown from '@/components/FilterDropdown';
-import { AddContentDialog } from '@/components/AddContentDialog';
-import { ShareBrainDialog } from '@/components/ShareBrainDialog';
+import AddContentDialog from '@/components/AddContentDialog';
+import ShareBrainDialog from '@/components/ShareBrainDialog';
 import { Toggle } from '@/components/ui/toggle';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 interface Content {
   id: number;
@@ -62,28 +63,28 @@ const Dashboard = () => {
           content: [
             {
               id: 1,
-              type: 'document',
+              type: 'document' as const,
               link: 'https://example.com/doc1',
               title: 'How to Take Smart Notes',
               tags: ['productivity', 'learning']
             },
             {
               id: 2,
-              type: 'youtube',
+              type: 'youtube' as const,
               link: 'https://youtube.com/watch?v=123',
               title: 'The Science of Learning',
               tags: ['education', 'science']
             },
             {
               id: 3,
-              type: 'tweet',
+              type: 'tweet' as const,
               link: 'https://twitter.com/user/status/123',
               title: 'Insights on Personal Knowledge Management',
               tags: ['productivity', 'PKM']
             },
             {
               id: 4,
-              type: 'link',
+              type: 'link' as const,
               link: 'https://medium.com/article-about-note-taking',
               title: 'Best Note-Taking Methods',
               tags: ['productivity', 'creativity']
@@ -91,7 +92,7 @@ const Dashboard = () => {
           ]
         };
         
-        setContent(mockData.content);
+        setContent(mockData.content as Content[]);
         
         // Extract all unique tags
         const tags = mockData.content.flatMap(item => item.tags);
@@ -129,6 +130,23 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error deleting content:', error);
     }
+  };
+
+  // Add new content handler
+  const handleContentAdded = (newContent: Omit<Content, 'id'>) => {
+    const contentWithId: Content = {
+      ...newContent,
+      id: content.length + 1
+    };
+    setContent(prev => [...prev, contentWithId]);
+    
+    // Update tags
+    const newTags = newContent.tags.filter(tag => !allTags.includes(tag));
+    if (newTags.length > 0) {
+      setAllTags(prev => [...prev, ...newTags]);
+    }
+    
+    setIsAddDialogOpen(false);
   };
 
   const containerVariants = {
@@ -255,30 +273,21 @@ const Dashboard = () => {
         </motion.div>
       </main>
       
-      <AddContentDialog
-        open={isAddDialogOpen}
-        onOpenChange={setIsAddDialogOpen}
-        onContentAdded={(newContent) => {
-          // In a real app, you'd make an API call here
-          const contentWithId = {
-            ...newContent,
-            id: content.length + 1
-          };
-          setContent(prev => [...prev, contentWithId]);
-          
-          // Update tags
-          const newTags = newContent.tags.filter(tag => !allTags.includes(tag));
-          if (newTags.length > 0) {
-            setAllTags(prev => [...prev, ...newTags]);
-          }
-        }}
-        availableTags={allTags}
-      />
+      {/* Dialogs */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="sm:max-w-2xl">
+          <AddContentDialog 
+            onAdd={handleContentAdded} 
+            onClose={() => setIsAddDialogOpen(false)} 
+          />
+        </DialogContent>
+      </Dialog>
       
-      <ShareBrainDialog 
-        open={isShareDialogOpen}
-        onOpenChange={setIsShareDialogOpen}
-      />
+      <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
+        <DialogContent className="sm:max-w-2xl">
+          <ShareBrainDialog onClose={() => setIsShareDialogOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
