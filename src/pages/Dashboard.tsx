@@ -17,6 +17,7 @@ interface Content {
   link: string;
   title: string;
   tags: string[];
+  content?: string;
 }
 
 const Dashboard = () => {
@@ -64,7 +65,8 @@ const Dashboard = () => {
             {
               id: 1,
               type: 'document' as const,
-              link: 'https://example.com/doc1',
+              link: '',
+              content: '# How to Take Smart Notes\n\nWhen taking notes, focus on **connecting ideas** rather than just collecting information. Here are some tips:\n\n1. Write in your own words\n2. Connect new notes to existing ones\n3. Keep your notes atomic\n4. Review regularly',
               title: 'How to Take Smart Notes',
               tags: ['productivity', 'learning']
             },
@@ -170,12 +172,12 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <motion.h1 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-2xl font-bold"
+            className="text-2xl font-bold text-gray-900 dark:text-gray-100"
           >
             Brainly
           </motion.h1>
@@ -186,6 +188,7 @@ const Dashboard = () => {
               size="icon" 
               onClick={toggleTheme} 
               aria-label="Toggle dark mode"
+              className="border-gray-200 dark:border-gray-700"
             >
               {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
             </Button>
@@ -206,7 +209,7 @@ const Dashboard = () => {
               placeholder="Search notes, links, tweets..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full"
+              className="w-full bg-white dark:bg-gray-800"
             />
           </div>
           
@@ -219,7 +222,7 @@ const Dashboard = () => {
             
             <Button 
               onClick={() => setIsAddDialogOpen(true)}
-              className="bg-gray-900 text-white hover:bg-gray-800 dark:bg-gray-200 dark:text-gray-900 dark:hover:bg-gray-300 flex-shrink-0"
+              className="text-white dark:text-gray-900 flex-shrink-0"
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Content
